@@ -7,6 +7,34 @@ let postits = []
 let isEdit = false
 let oldPostitState = {}
 
+const handleClick = function (e) {
+  const role = e.target.dataset.role
+
+  switch (role) {
+    case 'edit':
+      if (isEdit) return
+      handleEditPostit(e)
+      isEdit = true
+      break
+    case 'delete':
+      if (isEdit) return
+      handleDeletePostit(e)
+      break
+    case 'save':
+      if (!isEdit) return
+      handleSavePostit(e)
+      isEdit = false
+      break
+    case 'cancel':
+      if (!isEdit) return
+      handleCancelPostit(e)
+      isEdit = false
+      break
+    default:
+      return
+  }
+}
+
 const setPostit = function (postits) {
   localStorage.setItem('postits', JSON.stringify(postits))
 }
@@ -20,7 +48,7 @@ const handleDeleteAll = function (e) {
 }
 
 const handleDeletePostit = function (e) {
-  const postitId = JSON.parse(e.currentTarget.dataset.postitId)
+  const postitId = JSON.parse(e.target.dataset.postitId)
   postits = postits.filter((postit) => postit.id !== postitId)
   setPostit(postits)
   const postitItem = document.getElementById(postitId)
@@ -30,10 +58,7 @@ const handleDeletePostit = function (e) {
 }
 
 const handleEditPostit = function (e) {
-  if (isEdit) {
-    return
-  }
-  const postitId = e.currentTarget.dataset.postitId
+  const postitId = e.target.dataset.postitId
   const postitItem = document.getElementById(postitId)
   const title = postitItem.querySelector('.postit-title')
   const content = postitItem.querySelector('.postit-content')
@@ -44,29 +69,28 @@ const handleEditPostit = function (e) {
   postitItem.classList.add('edit')
   title.setAttribute('contenteditable', true)
   content.setAttribute('contenteditable', true)
-  isEdit = true
 }
 
 const handleCancelPostit = function (e) {
-  const postitId = e.currentTarget.dataset.postitId
+  const postitId = JSON.parse(e.target.dataset.postitId)
   const postitItem = document.getElementById(postitId)
   const title = postitItem.getElementsByClassName('postit-title')[0]
   const content = postitItem.getElementsByClassName('postit-content')[0]
-  title.innerText = oldPostitState.title
-  content.innerText = oldPostitState.content
+  const postit = postits.find((postit) => postit.id === postitId)
+  title.innerText = postit.title
+  content.innerText = postit.content
   postitItem.classList.remove('edit')
   title.setAttribute('contenteditable', false)
   content.setAttribute('contenteditable', false)
-  isEdit = false
 }
 
 const handleSavePostit = function (e) {
-  const postitId = JSON.parse(e.currentTarget.dataset.postitId)
+  const postitId = JSON.parse(e.target.dataset.postitId)
   const postitItem = document.getElementById(postitId)
   const title = postitItem.getElementsByClassName('postit-title')[0]
   const content = postitItem.getElementsByClassName('postit-content')[0]
   postits = postits.map((postit) => {
-    if (postit.id !== postitId) return
+    if (postit.id !== postitId) postit
     return {
       ...postit,
       title: title.innerText,
@@ -77,7 +101,6 @@ const handleSavePostit = function (e) {
   postitItem.classList.remove('edit')
   title.setAttribute('contenteditable', false)
   content.setAttribute('contenteditable', false)
-  isEdit = false
 }
 
 const handleSubmit = function (e) {
@@ -85,6 +108,12 @@ const handleSubmit = function (e) {
 
   const title = e.target.title
   const content = e.target.content
+
+  if (!title.value || !content.value) {
+    alert('Les champs son vide!')
+    return
+  }
+
   const now = Date.now()
 
   const postit = {
@@ -108,10 +137,6 @@ const handleSubmit = function (e) {
     postitItem.getElementsByClassName('postit-updated_at')[0]
   const postitTitle = postitItem.getElementsByClassName('postit-title')[0]
   const postitContent = postitItem.getElementsByClassName('postit-content')[0]
-  const postitDelete = postitItem.getElementsByClassName('postit-delete')[0]
-  const postitEdit = postitItem.getElementsByClassName('postit-edit')[0]
-  const postitCancel = postitItem.getElementsByClassName('postit-cancel')[0]
-  const postitSave = postitItem.getElementsByClassName('postit-save')[0]
 
   const dateTime = `${new Date(
     postit.created_at
@@ -119,19 +144,14 @@ const handleSubmit = function (e) {
 
   postitCreatedAt.innerText = dateTime
   postitUpdatedAt.innerText = dateTime
-  postitTitle.innerText = `${postit.id} - ${postit.title}`
+  postitTitle.innerText = postit.title
   postitContent.innerText = postit.content
 
   postitItem.setAttribute('id', postit.id)
   postitItem
     .querySelectorAll('button')
     .forEach((btn) => btn.setAttribute('data-postit-id', postit.id))
-
-  postitDelete.addEventListener('click', handleDeletePostit)
-  postitEdit.addEventListener('click', handleEditPostit)
-  postitCancel.addEventListener('click', handleCancelPostit)
-  postitSave.addEventListener('click', handleSavePostit)
-
+  postitItem.addEventListener('click', handleClick)
   postitItems.appendChild(clone)
 }
 
