@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Postit</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Roboto&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="style.css" />
+    <script src="script.js" defer></script>
+  </head>
+  <body>
+    <header>
+      <h1>Postit</h1>
+      <form id="header-form">
+        <label for="title"></label>
+        <input type="text" name="title" id="title" placeholder="Titre" />
+        <label for="content"></label>
+        <textarea name="content" id="content" placeholder="Contenu"></textarea>
+        <button type="submit">Ajouter</button>
+      </form>
+      <button id="header-delete">Supprimer tout</button>
+    </header>
+    <main>
+      <ul id="postit-items"></ul>
+    </main>
+    <template id="postit-template">
+      <li class="postit-item">
+        <article>
+          <div class="postit-item__actions">
+            <button class="postit-edit">modifier</button>
+            <button class="postit-delete">supprimer</button>
+            <button class="postit-save">enregister</button>
+            <button class="postit-cancel">annuler</button>
+          </div>
+          <p>Création: <time class="postit-created_at"></time></p>
+          <p>Mise à jour: <time class="postit-updated_at"></time></p>
+          <h2 class="postit-title"></h2>
+          <p class="postit-content"></p>
+        </article>
+      </li>
+    </template>
+  </body>
+</html>
